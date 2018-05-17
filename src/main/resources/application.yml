@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+logging.level:
+  root: WARN
+  jp.co.tdc: INFO
