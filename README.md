@@ -20,6 +20,8 @@ LINE に Push Notification API を使用してメッセージを送信するシ�
 
 * Spring Boot 2.x
 
+LINE公式の [LINE Bot SDK Java](https://github.com/line/line-bot-sdk-java) は使用していません。
+
 ## ビルド手順
 
 Maven を使用してビルドします。
@@ -126,3 +128,7 @@ HTTPプロキシ経由でLINE APIにアクセスする必要がある場合は�
 ```bash
 -Dhttps.proxyHost=<プロキシホスト名> -Dhttps.proxyPort=<プロキシポート>
 ```
+
+## 構成図
+
+![構成図](docs/resources/architecture.png)
