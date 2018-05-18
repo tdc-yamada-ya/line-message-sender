@@ -9,3 +9,6 @@ flyway:
 logging.level:
   root: WARN
   jp.co.tdc: INFO
+line:
+  channelId: 9999999999
+  pushRatePerMinute: 1
