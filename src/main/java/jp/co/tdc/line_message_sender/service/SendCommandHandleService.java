@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -29,6 +30,11 @@ import org.springframework.stereotype.Service;
 public class SendCommandHandleService implements CommandHandleService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SendCommandHandleService.class);
 
+	private static final String TAG_OPTION_NAME = "tag";
+	private static final String FIND_PUSH_MESSAGES_SQL = "SELECT push_message_id, target_type, target, template_id FROM line_push_message WHERE channel_id = ? AND tag = ? AND sent_at IS NULL AND error_at IS NULL";
+	private static final String FIND_MESSAGE_TEMPLATE_SQL = "SELECT payload_type, payload FROM line_message_template WHERE template_id = ?";
+	private static final String PATCH_PUSH_MESSAGE_SQL = "UPDATE line_push_message SET sent_at = ?, error_at = ? WHERE push_message_id = ?";
+
 	@Autowired
 	private LineProperties lineProperties;
 
@@ -38,15 +44,26 @@ public class SendCommandHandleService implements CommandHandleService {
 	@Autowired
 	private DataSource dataSource;
 
+	@Autowired
+	private LineMessagingComponent lineMessagingComponent;
+
 	@Override
 	public void run(ApplicationArguments args) {
+		List<String> tagOptionValues = args.getOptionValues(TAG_OPTION_NAME);
+
+		if (tagOptionValues == null || tagOptionValues.isEmpty()) {
+			throw new CommandHandleServiceException("\"--tag=<tag>\" is not specified");
+		}
+
+		String tag = tagOptionValues.get(0);
+
 		LineChannelToken token = lineChannelTokenRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAt(lineProperties.getChannelId());
 
 		if (token == null) {
 			throw new CommandHandleServiceException("Token not found - channelId=" + lineProperties.getChannelId());
 		}
 
-		LineMessagingClient lineMessagingClient = new LineMessagingClient(token.getToken());
+		LineMessagingClient client = new LineMessagingClient(token.getToken());
 		long apiCallCountBaseTimeInMillis;
 		int apiCallCountPerMinute;
 		int sentCount = 0;
@@ -57,16 +74,14 @@ public class SendCommandHandleService implements CommandHandleService {
 				connection.setAutoCommit(true);
 
 				try (
-					PreparedStatement selectPushMessageStatement = connection.prepareStatement(
-							"SELECT push_message_id, target_type, target, template_id FROM line_push_message WHERE channel_id = ? AND sent_at IS NULL AND error_at IS NULL");
-					PreparedStatement selectMessageTemplateStatement = connection.prepareStatement(
-							"SELECT payload_type, payload FROM line_message_template WHERE template_id = ?");
-					PreparedStatement updatePushMessageStatement = connection.prepareStatement(
-							"UPDATE line_push_message SET sent_at = ?, error_at = ? WHERE push_message_id = ?")
+					PreparedStatement findPushMessagesStatement = connection.prepareStatement(FIND_PUSH_MESSAGES_SQL);
+					PreparedStatement findMessageTemplateStatement = connection.prepareStatement(FIND_MESSAGE_TEMPLATE_SQL);
+					PreparedStatement patchPushMessageStatement = connection.prepareStatement(PATCH_PUSH_MESSAGE_SQL)
 				) {
-					selectPushMessageStatement.setString(1, lineProperties.getChannelId());
+					findPushMessagesStatement.setString(1, lineProperties.getChannelId());
+					findPushMessagesStatement.setString(2, tag);
 
-					try (ResultSet pushMessageResultSet = selectPushMessageStatement.executeQuery()) {
+					try (ResultSet pushMessageResultSet = findPushMessagesStatement.executeQuery()) {
 						apiCallCountBaseTimeInMillis = System.currentTimeMillis();
 						apiCallCountPerMinute = 0;
 
@@ -80,9 +95,9 @@ public class SendCommandHandleService implements CommandHandleService {
 								String payloadType = null;
 								String payload = null;
 
-								selectMessageTemplateStatement.setString(1, templateId);
+								findMessageTemplateStatement.setString(1, templateId);
 
-								try (ResultSet messageTemplateResultSet = selectMessageTemplateStatement.executeQuery()) {
+								try (ResultSet messageTemplateResultSet = findMessageTemplateStatement.executeQuery()) {
 									if (messageTemplateResultSet.next()) {
 										payloadType = messageTemplateResultSet.getString(1);
 										payload = messageTemplateResultSet.getString(2);
@@ -102,25 +117,29 @@ public class SendCommandHandleService implements CommandHandleService {
 								if (StringUtils.equals(targetType, TargetType.to.name())) {
 									PushMessage pushMessage = new PushMessage(target, message);
 
-									apiCallCountPerMinute++;
-									lineMessagingClient.push(pushMessage);
+									try {
+										lineMessagingComponent.pushMessage(client, pushMessage);
+										apiCallCountPerMinute++;
+									} catch (Exception e) {
+										throw new PushMessageException("Push API error", e);
+									}
 								} else {
 									throw new PushMessageException("TargetType not defined - targetType=" + targetType);
 								}
 
-								updatePushMessageStatement.setDate(1, new java.sql.Date(new Date().getTime()));
-								updatePushMessageStatement.setDate(2, null);
-								updatePushMessageStatement.setString(3, pushMessageId);
-								updatePushMessageStatement.executeUpdate();
+								patchPushMessageStatement.setDate(1, new java.sql.Date(new Date().getTime()));
+								patchPushMessageStatement.setDate(2, null);
+								patchPushMessageStatement.setString(3, pushMessageId);
+								patchPushMessageStatement.executeUpdate();
 
 								sentCount++;
 							} catch (PushMessageException e) {
 								LOGGER.warn("Push message failed - pushMessageId={} message={}", pushMessageId, e.getMessage());
 
-								updatePushMessageStatement.setDate(1, null);
-								updatePushMessageStatement.setDate(2, new java.sql.Date(new Date().getTime()));
-								updatePushMessageStatement.setString(3, pushMessageId);
-								updatePushMessageStatement.executeUpdate();
+								patchPushMessageStatement.setDate(1, null);
+								patchPushMessageStatement.setDate(2, new java.sql.Date(new Date().getTime()));
+								patchPushMessageStatement.setString(3, pushMessageId);
+								patchPushMessageStatement.executeUpdate();
 
 								errorCount++;
 							}
@@ -156,6 +175,10 @@ public class SendCommandHandleService implements CommandHandleService {
 
 		public PushMessageException(String message) {
 			super(message);
+		}
+
+		public PushMessageException(String message, Throwable cause) {
+			super(message, cause);
 		}
 	}
 }

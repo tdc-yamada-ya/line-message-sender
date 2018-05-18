@@ -31,6 +31,9 @@ public class RefreshTokenCommandHandleService implements CommandHandleService {
 	@Autowired
 	private LineChannelTokenRepository lineChannelTokenRepository;
 
+	@Autowired
+	private LineOAuthComponent lineOAuthComponent;
+
 	@Override
 	public void run(ApplicationArguments args) {
 		LineChannelCredential credential = lineChannelCredentialRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAt(lineProperties.getChannelId());
@@ -45,7 +48,7 @@ public class RefreshTokenCommandHandleService implements CommandHandleService {
 
 		LOGGER.info("Get access token - channelId={}", lineProperties.getChannelId());
 
-		AccessToken response = client.getAccessToken();
+		AccessToken response = lineOAuthComponent.getAccessToken(client);
 
 		LineChannelToken token = new LineChannelToken();
 

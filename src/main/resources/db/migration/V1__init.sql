@@ -32,9 +32,11 @@ CREATE TABLE line_push_message (
   target_type           VARCHAR(15),
   target                VARCHAR(100),
   template_id           VARCHAR(50),
+  tag                   VARCHAR(50),
   created_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   sent_at               DATETIME,
   error_at              DATETIME,
 
+  INDEX (channel_id, created_at, error_at, tag),
   FOREIGN KEY (template_id) REFERENCES line_message_template(template_id)
 );

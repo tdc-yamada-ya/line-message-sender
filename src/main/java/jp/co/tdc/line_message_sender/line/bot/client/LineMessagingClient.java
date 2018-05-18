@@ -12,7 +12,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-
 public class LineMessagingClient {
 	private String channelToken;;
 
@@ -20,7 +19,7 @@ public class LineMessagingClient {
 		this.channelToken = channelToken;
 	}
 
-	public void push(PushMessage pushMessage) {
+	public void pushMessage(PushMessage pushMessage) {
 		HttpHeaders headers = new HttpHeaders();
 
 		headers.setContentType(MediaType.APPLICATION_JSON);

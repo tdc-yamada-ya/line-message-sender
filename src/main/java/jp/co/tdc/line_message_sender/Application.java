@@ -15,8 +15,10 @@ import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.retry.annotation.EnableRetry;
 
 @SpringBootApplication
+@EnableRetry
 public class Application implements ApplicationRunner {
 	@Autowired
 	private RefreshTokenCommandHandleService refreshTokenCommandHandler;
