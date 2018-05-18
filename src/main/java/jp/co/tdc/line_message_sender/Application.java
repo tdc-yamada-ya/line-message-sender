@@ -20,6 +20,9 @@ import org.springframework.retry.annotation.EnableRetry;
 @SpringBootApplication
 @EnableRetry
 public class Application implements ApplicationRunner {
+	public static final String REFRESH_TOKEN_COMMAND_NAME = "refresh-token";
+	public static final String SEND_TOKEN_COMMAND_NAME = "send";
+
 	@Autowired
 	private RefreshTokenCommandHandleService refreshTokenCommandHandler;
 
@@ -39,8 +42,8 @@ public class Application implements ApplicationRunner {
 	public void run(ApplicationArguments args) throws Exception {
 		Map<String, CommandHandleService> commandHandleServiceMap = new HashMap<>();
 
-		commandHandleServiceMap.put("refresh-token", refreshTokenCommandHandler);
-		commandHandleServiceMap.put("send", sendCommandHandler);
+		commandHandleServiceMap.put(REFRESH_TOKEN_COMMAND_NAME, refreshTokenCommandHandler);
+		commandHandleServiceMap.put(SEND_TOKEN_COMMAND_NAME, sendCommandHandler);
 
 		List<String> nonOptionArgs = args.getNonOptionArgs();
 

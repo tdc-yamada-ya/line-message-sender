@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class LineMessagingClient {
-	private String channelToken;;
+	private String channelToken;
 
 	public LineMessagingClient(String channelToken) {
 		this.channelToken = channelToken;

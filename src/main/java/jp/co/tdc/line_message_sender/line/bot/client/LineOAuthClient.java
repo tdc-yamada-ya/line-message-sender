@@ -16,6 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class LineOAuthClient {
+	private static final String OAUTH_ENDPOINT = "https://api.line.me/v2/oauth";
+	private static final String ACCESS_TOKEN_URI = OAUTH_ENDPOINT + "/accessToken";
+
 	private String channelId;
 	private String channelSecret;
 
@@ -35,7 +38,7 @@ public class LineOAuthClient {
 		body.add("client_id", channelId);
 		body.add("client_secret", channelSecret);
 
-		URI uri = UriComponentsBuilder.fromUriString("https://api.line.me/v2/oauth/accessToken").build().toUri();
+		URI uri = UriComponentsBuilder.fromUriString(ACCESS_TOKEN_URI).build().toUri();
 		RequestEntity<?> requestEntity = new RequestEntity<>(body, headers, HttpMethod.POST, uri);
 		RestTemplate client = new RestTemplate();
 
