@@ -57,7 +57,7 @@ LINE_PUSH_RATE_PER_MINUTE="1分間あたりのPush回数の上限"
 * 環境変数ではなくファイルで設定したい場合はJavaアプリケーションの実行時引数に `--spring.config.location=<ファイルパス>` を指定してください
     * 設定ファイルのサンプルは `docs/examples/application.yml` です
 
-### 初期データの登録
+### データの登録
 
 データベースに以下の初期データを登録してください。データのサンプルは `docs/examples` に入っています。
 
@@ -115,8 +115,8 @@ java -jar target/line-message-sender-1.0.0.jar send --tag=<タグ>
 ```
 
 * 送信対象のメッセージはチャンネルID(`channel_id`)およびタグ(`tag`)がパラメータと一致する、かつ送信済み(`sent_at IS NULL`)あるいはエラー発生済み(`error_at IS NULL`)ではないものです
-* 送信が完了すると `line_push_message` の `sent_at` に現在時刻が入ります
-* エラーが発生すると `line_push_message` の `error_at` に現在時刻が入ります
+* 送信が完了したメッセージは `line_push_message` の `sent_at` に現在時刻が入ります
+* エラーが発生したメッセージは `line_push_message` の `error_at` に現在時刻が入ります
     * LINE API の呼び出しは最大３回、バックオフディレイ 1000ms のリトライ処理が含まれています
 
 ### HTTPプロキシを有効にする
