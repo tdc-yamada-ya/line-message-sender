@@ -63,7 +63,7 @@ LINE_PUSH_RATE_PER_MINUTE="1分間あたりのPush回数の上限"
 
 * チャンネル認証情報 (line_channel_credential.csv)
     * 認証情報IDの形式は任意です
-    * チャンネルの情報は LINE Developers サイトに登録したチャンネルのページから取得します
+    * チャンネルの情報は [LINE Developers](https://developers.line.me/) に登録したチャンネルのページから取得します
     * 一つのチャンネルIDに対して複数の認証情報を登録することができます。複数登録した場合、最後に登録したチャンネル認証情報を使用します
 
 ```csv
@@ -83,7 +83,7 @@ template_id,payload_type,payload
     * プッシュメッセージIDの形式は任意です
     * ターゲットIDは LINE Webhook で取得できるユーザID, グループID, ルームIDのいずれかを指定します
         * LINE アプリに表示される LINE ID ではないので注意してください
-        * LINE echo bot というサンプルを公開しているのでそちらでIDを取得してください
+        * [line-echo-bot](https://github.com/tdc-yamada-ya/line-echo-bot) というシンプルなボットのサンプルを公開しているのでそちらを使用してIDを取得してください
     * タグには任意の文字列を指定してください
         * 実際に送信処理を行う際に、タグ文字列によるフィルタリングを行います
         * 例えば1日ごとに送信するメッセージを切り替えたい場合はタグに日付(YYYYMMDD)を指定して、送信を実行する際に日付をパラメータに含めます
