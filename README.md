@@ -42,7 +42,7 @@ CREATE DATABASE line_integration;
 
 アプリケーションを実行する場合は以下の環境変数を設定してください。
 
-```
+```bash
 SPRING_DATASOURCE_URL="MySQLデータベース 接続文字列 (jdbc:mysql://localhost:3306/line_integration)"
 SPRING_DATASOURCE_USERNAME="MySQL データベース ユーザ名"
 SPRING_DATASOURCE_PASSWORD="MySQL データベース パスワード"
@@ -66,7 +66,7 @@ LINE_PUSH_RATE_PER_MINUTE="1分間あたりのPush回数の上限"
     * チャンネルの情報は LINE Developers サイトに登録したチャンネルのページから取得します
     * 一つのチャンネルIDに対して複数の認証情報を登録することができます。複数登録した場合、最後に登録したチャンネル認証情報を使用します
 
-```
+```csv
 channel_credential_id,channel_id,channel_secret
 <チャンネル認証情報ID>,<チャンネルID>,<チャンネルシークレット>
 ```
@@ -74,7 +74,7 @@ channel_credential_id,channel_id,channel_secret
 * メッセージテンプレート (line_message_template.csv)
     * メッセージテンプレートIDの形式は任意です
 
-```
+```csv
 template_id,payload_type,payload
 <メッセージテンプレートID>,<現在は text で固定>,<メッセージ本文>
 ```
@@ -88,7 +88,7 @@ template_id,payload_type,payload
         * 実際に送信処理を行う際に、タグ文字列によるフィルタリングを行います
         * 例えば1日ごとに送信するメッセージを切り替えたい場合はタグに日付(YYYYMMDD)を指定して、送信を実行する際に日付をパラメータに含めます
 
-```
+```csv
 push_message_id,channel_id,target_type,target,template_id,tag
 <プッシュメッセージID>,<チャンネルID>,<現在は to で固定>,<ターゲットID>,<メッセージテンプレートID>,<タグ>
 ```
