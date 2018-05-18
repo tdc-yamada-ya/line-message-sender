@@ -8,7 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -19,7 +19,7 @@ public class LineMessagingClient {
 		this.channelToken = channelToken;
 	}
 
-	public void pushMessage(PushMessage pushMessage) {
+	public void pushMessage(PushMessage pushMessage) throws RestClientException {
 		HttpHeaders headers = new HttpHeaders();
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -31,8 +31,8 @@ public class LineMessagingClient {
 
 		try {
 			client.exchange(requestEntity, String.class);
-		} catch (HttpClientErrorException e) {
-			LineClientUtils.handleHttpClientErrorException(e);
+		} catch (RestClientException e) {
+			LineClientUtils.handleRestClientException(e);
 			throw e;
 		}
 	}

@@ -36,7 +36,7 @@ public class RefreshTokenCommandHandleService implements CommandHandleService {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		LineChannelCredential credential = lineChannelCredentialRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAt(lineProperties.getChannelId());
+		LineChannelCredential credential = lineChannelCredentialRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAtDesc(lineProperties.getChannelId());
 
 		if (credential == null) {
 			throw new CommandHandleServiceException("Credential not found - channelId=" + lineProperties.getChannelId());

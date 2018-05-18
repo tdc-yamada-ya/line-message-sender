@@ -11,7 +11,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -24,7 +24,7 @@ public class LineOAuthClient {
 		this.channelSecret = channelSecret;
 	}
 
-	public AccessToken getAccessToken() {
+	public AccessToken getAccessToken() throws RestClientException {
 		HttpHeaders headers = new HttpHeaders();
 
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -43,8 +43,8 @@ public class LineOAuthClient {
 			ResponseEntity<AccessToken> responseEntity = client.exchange(requestEntity, AccessToken.class);
 
 			return responseEntity.getBody();
-		} catch (HttpClientErrorException e) {
-			LineClientUtils.handleHttpClientErrorException(e);
+		} catch (RestClientException e) {
+			LineClientUtils.handleRestClientException(e);
 			throw e;
 		}
 	}

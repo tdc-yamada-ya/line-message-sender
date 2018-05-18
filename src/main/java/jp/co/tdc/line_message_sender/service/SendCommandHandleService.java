@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 
 @Service
 public class SendCommandHandleService implements CommandHandleService {
@@ -57,11 +58,13 @@ public class SendCommandHandleService implements CommandHandleService {
 
 		String tag = tagOptionValues.get(0);
 
-		LineChannelToken token = lineChannelTokenRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAt(lineProperties.getChannelId());
+		LineChannelToken token = lineChannelTokenRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAtDesc(lineProperties.getChannelId());
 
 		if (token == null) {
 			throw new CommandHandleServiceException("Token not found - channelId=" + lineProperties.getChannelId());
 		}
+
+		LOGGER.info("Found token - channelTokenId={}", token.getChannelTokenId());
 
 		LineMessagingClient client = new LineMessagingClient(token.getToken());
 		long apiCallCountBaseTimeInMillis;
@@ -120,7 +123,7 @@ public class SendCommandHandleService implements CommandHandleService {
 									try {
 										lineMessagingComponent.pushMessage(client, pushMessage);
 										apiCallCountPerMinute++;
-									} catch (Exception e) {
+									} catch (RestClientException e) {
 										throw new PushMessageException("Push API error", e);
 									}
 								} else {
@@ -134,7 +137,7 @@ public class SendCommandHandleService implements CommandHandleService {
 
 								sentCount++;
 							} catch (PushMessageException e) {
-								LOGGER.warn("Push message failed - pushMessageId={} message={}", pushMessageId, e.getMessage());
+								LOGGER.warn("Push message failed - pushMessageId={}", pushMessageId, e);
 
 								patchPushMessageStatement.setDate(1, null);
 								patchPushMessageStatement.setDate(2, new java.sql.Date(new Date().getTime()));

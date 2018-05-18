@@ -9,5 +9,5 @@ public interface LineChannelCredentialRepository extends JpaRepository<LineChann
 	 * @param channelId チャンネルID
 	 * @return 最新のクレデンシャル
 	 */
-	public LineChannelCredential findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAt(String channelId);
+	public LineChannelCredential findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAtDesc(String channelId);
 }

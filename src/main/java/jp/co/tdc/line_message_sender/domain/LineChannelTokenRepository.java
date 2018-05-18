@@ -9,5 +9,5 @@ public interface LineChannelTokenRepository extends JpaRepository<LineChannelTok
 	 * @param channelId チャンネルID
 	 * @return 最新のトークン
 	 */
-	public LineChannelToken findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAt(String channelId);
+	public LineChannelToken findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAtDesc(String channelId);
 }
