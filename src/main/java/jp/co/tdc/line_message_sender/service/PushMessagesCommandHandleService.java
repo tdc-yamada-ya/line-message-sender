@@ -9,6 +9,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+
 import jp.co.tdc.line_message_sender.config.LineProperties;
 import jp.co.tdc.line_message_sender.domain.LineChannelToken;
 import jp.co.tdc.line_message_sender.domain.LineChannelTokenRepository;
@@ -18,14 +26,6 @@ import jp.co.tdc.line_message_sender.line.bot.client.LineMessagingClient;
 import jp.co.tdc.line_message_sender.line.bot.model.Message;
 import jp.co.tdc.line_message_sender.line.bot.model.PushMessage;
 import jp.co.tdc.line_message_sender.line.bot.model.TextMessage;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 
 @Service
 public class PushMessagesCommandHandleService implements CommandHandleService {
@@ -130,7 +130,7 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 									throw new PushMessageException("TargetType not defined - targetType=" + targetType);
 								}
 
-								patchPushMessageStatement.setDate(1, new java.sql.Date(new Date().getTime()));
+								patchPushMessageStatement.setTimestamp(1, new java.sql.Timestamp(new Date().getTime()));
 								patchPushMessageStatement.setDate(2, null);
 								patchPushMessageStatement.setString(3, pushMessageId);
 								patchPushMessageStatement.executeUpdate();
@@ -140,7 +140,7 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 								LOGGER.warn("Push message failed - pushMessageId={}", pushMessageId, e);
 
 								patchPushMessageStatement.setDate(1, null);
-								patchPushMessageStatement.setDate(2, new java.sql.Date(new Date().getTime()));
+								patchPushMessageStatement.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
 								patchPushMessageStatement.setString(3, pushMessageId);
 								patchPushMessageStatement.executeUpdate();
 
