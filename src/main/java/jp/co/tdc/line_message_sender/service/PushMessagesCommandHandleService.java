@@ -28,8 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
 @Service
-public class SendCommandHandleService implements CommandHandleService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SendCommandHandleService.class);
+public class PushMessagesCommandHandleService implements CommandHandleService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PushMessagesCommandHandleService.class);
 
 	private static final String TAG_OPTION_NAME = "tag";
 	private static final String FIND_PUSH_MESSAGES_SQL = "SELECT push_message_id, target_type, target, template_id FROM line_push_message WHERE channel_id = ? AND tag = ? AND sent_at IS NULL AND error_at IS NULL";
