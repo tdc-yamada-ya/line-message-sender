@@ -113,7 +113,7 @@ java -jar target/line-message-sender-1.0.0.jar refresh-token
 以下のコマンドを実行するとプッシュ送信が実行されます。
 
 ```bash
-java -jar target/line-message-sender-1.0.0.jar send --tag=<タグ>
+java -jar target/line-message-sender-1.0.0.jar push-messages --tag=<タグ>
 ```
 
 * 送信対象のメッセージはチャンネルID(`channel_id`)およびタグ(`tag`)がパラメータと一致する、かつ送信済み(`sent_at IS NULL`)あるいはエラー発生済み(`error_at IS NULL`)ではないものです
