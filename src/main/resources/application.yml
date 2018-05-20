@@ -1,6 +1,9 @@
 spring:
   datasource:
     driverClassName: com.mysql.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 0
 logging.level:
   root: WARN
   jp.co.tdc: INFO
