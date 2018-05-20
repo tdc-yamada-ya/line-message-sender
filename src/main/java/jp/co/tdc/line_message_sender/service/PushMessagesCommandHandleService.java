@@ -148,7 +148,9 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 								}
 
 								if (payloadType == null || payload == null) {
-									throw new PushMessageInternalException("Message template not found - templateId=" + templateId);
+									LOGGER.warn("Message template \"" + templateId + "\" not found - pushMessageId={}", pushMessageId);
+
+									throw new PushMessageException("Message template \"" + templateId + "\" not found");
 								}
 
 								// 送信するメッセージを組み立て
@@ -166,10 +168,14 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 										lineMessagingComponent.pushMessage(client, pushMessage);
 										apiCallCountPerMinute++;
 									} catch (RestClientException e) {
-										throw new PushMessageInternalException("Push API error", e);
+										LOGGER.warn("Push API error - pushMessageId={} message=\"{}\"", pushMessageId, e.getMessage());
+
+										throw new PushMessageException("Push API error");
 									}
 								} else {
-									throw new PushMessageInternalException("Target type \"" + targetType + "\" not defined");
+									LOGGER.warn("Target type \"" + targetType + "\" not defined - pushMessageId={}", pushMessageId);
+
+									throw new PushMessageException("Target type \"" + targetType + "\" not defined");
 								}
 
 								// メッセージの送信時刻を更新
@@ -179,9 +185,7 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 								patchPushMessageStatement.executeUpdate();
 
 								sentCount++;
-							} catch (PushMessageInternalException e) {
-								LOGGER.warn("Push message failed - pushMessageId={}", pushMessageId, e);
-
+							} catch (PushMessageException e) {
 								// メッセージのエラー発生時刻を更新
 								patchPushMessageStatement.setDate(1, null);
 								patchPushMessageStatement.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
@@ -203,15 +207,11 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 		LOGGER.info("Push messages finished");
 	}
 
-	private static class PushMessageInternalException extends RuntimeException {
+	private static class PushMessageException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 
-		public PushMessageInternalException(String message) {
+		public PushMessageException(String message) {
 			super(message);
-		}
-
-		public PushMessageInternalException(String message, Throwable cause) {
-			super(message, cause);
 		}
 	}
 }
