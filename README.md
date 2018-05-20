@@ -69,6 +69,7 @@ LINE_PUSH_RATE_PER_MINUTE="1分間あたりのPush回数の上限"
 ### データの登録
 
 データベースに以下の初期データを登録してください。データのサンプルは `docs/examples` に入っています。
+データはCSVファイル等を直接データベースに登録するか、ロード用のコマンドを使用してください。
 
 * チャンネル認証情報 (line_channel_credential.csv)
     * 認証情報IDの形式は任意です
@@ -80,12 +81,20 @@ channel_credential_id,channel_id,channel_secret
 <チャンネル認証情報ID>,<チャンネルID>,<チャンネルシークレット>
 ```
 
+```bash
+java -jar target/line-message-sender-1.0.0.jar load-line-channel-credential --file=<CSVファイル>
+```
+
 * メッセージテンプレート (line_message_template.csv)
     * メッセージテンプレートIDの形式は任意です
 
 ```csv
 template_id,payload_type,payload
 <メッセージテンプレートID>,<現在は text で固定>,<メッセージ本文>
+```
+
+```bash
+java -jar target/line-message-sender-1.0.0.jar load-line-message-template --file=<CSVファイル>
 ```
 
 * プッシュメッセージ (line_push_message.csv)
@@ -100,6 +109,10 @@ template_id,payload_type,payload
 ```csv
 push_message_id,channel_id,target_type,target,template_id,tag
 <プッシュメッセージID>,<チャンネルID>,<現在は to で固定>,<ターゲットID>,<メッセージテンプレートID>,<タグ>
+```
+
+```bash
+java -jar target/line-message-sender-1.0.0.jar load-line-push-message --file=<CSVファイル>
 ```
 
 ### 短期アクセストークンを取得する
