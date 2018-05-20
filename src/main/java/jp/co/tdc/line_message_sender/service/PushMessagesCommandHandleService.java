@@ -50,6 +50,9 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 
 	@Override
 	public void run(ApplicationArguments args) {
+		LOGGER.info("Push messages start");
+
+		// 実行時引数から必要なパラメータを抽出
 		List<String> tagOptionValues = args.getOptionValues(TAG_OPTION_NAME);
 
 		if (tagOptionValues == null || tagOptionValues.isEmpty()) {
@@ -58,13 +61,18 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 
 		String tag = tagOptionValues.get(0);
 
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("tag=\"{}\"", tag);
+		}
+
+		// 最新のアクセストークンをデータベースから取得
 		LineChannelToken token = lineChannelTokenRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAtDesc(lineProperties.getChannelId());
 
 		if (token == null) {
 			throw new CommandHandleServiceException("Token not found - channelId=" + lineProperties.getChannelId());
 		}
 
-		LOGGER.info("Found token - channelTokenId={}", token.getChannelTokenId());
+		LOGGER.info("Found latest channel token - channelTokenId={}", token.getChannelTokenId());
 
 		LineMessagingClient client = new LineMessagingClient(token.getToken());
 
@@ -86,6 +94,7 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 					PreparedStatement findMessageTemplateStatement = connection.prepareStatement(FIND_MESSAGE_TEMPLATE_SQL);
 					PreparedStatement patchPushMessageStatement = connection.prepareStatement(PATCH_PUSH_MESSAGE_SQL)
 				) {
+					// Push 対象のメッセージを検索
 					findPushMessagesStatement.setString(1, lineProperties.getChannelId());
 					findPushMessagesStatement.setString(2, tag);
 
@@ -120,10 +129,15 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 							String target = pushMessageResultSet.getString(3);
 							String templateId = pushMessageResultSet.getString(4);
 
+							if (LOGGER.isDebugEnabled()) {
+								LOGGER.debug("pushMessageId={} targetType={} target={} templateId={}", pushMessageId, targetType, target, templateId);
+							}
+
 							try {
 								String payloadType = null;
 								String payload = null;
 
+								// 送信対象のメッセージテンプレートを検索
 								findMessageTemplateStatement.setString(1, templateId);
 
 								try (ResultSet messageTemplateResultSet = findMessageTemplateStatement.executeQuery()) {
@@ -134,9 +148,10 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 								}
 
 								if (payloadType == null || payload == null) {
-									throw new PushMessageException("Message template not found - templateId=" + templateId);
+									throw new PushMessageInternalException("Message template not found - templateId=" + templateId);
 								}
 
+								// 送信するメッセージを組み立て
 								Message message = null;
 
 								if (StringUtils.equals(payloadType, PayloadType.text.name())) {
@@ -144,27 +159,30 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 								}
 
 								if (StringUtils.equals(targetType, TargetType.to.name())) {
+									// ユーザID, グループID, ルームIDのいずれかを対象に送信
 									PushMessage pushMessage = new PushMessage(target, message);
 
 									try {
 										lineMessagingComponent.pushMessage(client, pushMessage);
 										apiCallCountPerMinute++;
 									} catch (RestClientException e) {
-										throw new PushMessageException("Push API error", e);
+										throw new PushMessageInternalException("Push API error", e);
 									}
 								} else {
-									throw new PushMessageException("TargetType not defined - targetType=" + targetType);
+									throw new PushMessageInternalException("Target type \"" + targetType + "\" not defined");
 								}
 
+								// メッセージの送信時刻を更新
 								patchPushMessageStatement.setTimestamp(1, new java.sql.Timestamp(new Date().getTime()));
 								patchPushMessageStatement.setDate(2, null);
 								patchPushMessageStatement.setString(3, pushMessageId);
 								patchPushMessageStatement.executeUpdate();
 
 								sentCount++;
-							} catch (PushMessageException e) {
+							} catch (PushMessageInternalException e) {
 								LOGGER.warn("Push message failed - pushMessageId={}", pushMessageId, e);
 
+								// メッセージのエラー発生時刻を更新
 								patchPushMessageStatement.setDate(1, null);
 								patchPushMessageStatement.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
 								patchPushMessageStatement.setString(3, pushMessageId);
@@ -181,16 +199,18 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 		} finally {
 			LOGGER.info("sentCount={}, errorCount={}", sentCount, errorCount);
 		}
+
+		LOGGER.info("Push messages finished");
 	}
 
-	private class PushMessageException extends RuntimeException {
+	private static class PushMessageInternalException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 
-		public PushMessageException(String message) {
+		public PushMessageInternalException(String message) {
 			super(message);
 		}
 
-		public PushMessageException(String message, Throwable cause) {
+		public PushMessageInternalException(String message, Throwable cause) {
 			super(message, cause);
 		}
 	}
