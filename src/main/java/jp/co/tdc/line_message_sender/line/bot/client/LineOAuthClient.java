@@ -2,8 +2,6 @@ package jp.co.tdc.line_message_sender.line.bot.client;
 
 import java.net.URI;
 
-import jp.co.tdc.line_message_sender.line.bot.model.AccessToken;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -15,14 +13,25 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class LineOAuthClient {
-	private static final String OAUTH_ENDPOINT = "https://api.line.me/v2/oauth";
-	private static final String ACCESS_TOKEN_URI = OAUTH_ENDPOINT + "/accessToken";
+import jp.co.tdc.line_message_sender.line.bot.model.AccessToken;
+
+public class LineOAuthClient extends LineClient {
+	private static final String ENDPOINT = "https://api.line.me/v2/oauth";
+	private static final String ACCESS_TOKEN_RESOURCE_NAME = "/accessToken";
+	private static final String GRANT_TYPE_PARAM_NAME = "grant_type";
+	private static final String CLIENT_CREDENTIALS_PARAM_VALUE = "client_credentials";
+	private static final String CLIENT_ID_PARAM_NAME = "client_id";
+	private static final String CLIENT_SECRET_PARAM_NAME = "client_secret";
 
 	private String channelId;
 	private String channelSecret;
 
+	/**
+	 * @param channelId LINE Developersサイトから確認できるLINEチャンネルID
+	 * @param channelSecret LINE Developersサイトから確認できるLINEチャンネルシークレット
+	 */
 	public LineOAuthClient(String channelId, String channelSecret) {
+		super(ENDPOINT);
 		this.channelId = channelId;
 		this.channelSecret = channelSecret;
 	}
@@ -34,13 +43,13 @@ public class LineOAuthClient {
 
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 
-		body.add("grant_type", "client_credentials");
-		body.add("client_id", channelId);
-		body.add("client_secret", channelSecret);
+		body.add(GRANT_TYPE_PARAM_NAME, CLIENT_CREDENTIALS_PARAM_VALUE);
+		body.add(CLIENT_ID_PARAM_NAME, channelId);
+		body.add(CLIENT_SECRET_PARAM_NAME, channelSecret);
 
-		URI uri = UriComponentsBuilder.fromUriString(ACCESS_TOKEN_URI).build().toUri();
+		URI uri = UriComponentsBuilder.fromUriString(getEndpoint() + ACCESS_TOKEN_RESOURCE_NAME).build().toUri();
 		RequestEntity<?> requestEntity = new RequestEntity<>(body, headers, HttpMethod.POST, uri);
-		RestTemplate client = new RestTemplate();
+		RestTemplate client = createClient();
 
 		try {
 			ResponseEntity<AccessToken> responseEntity = client.exchange(requestEntity, AccessToken.class);

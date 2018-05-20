@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -14,12 +16,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.retry.annotation.EnableRetry;
 
 import jp.co.tdc.line_message_sender.service.CommandHandleService;
-import jp.co.tdc.line_message_sender.service.RefreshTokenCommandHandleService;
 import jp.co.tdc.line_message_sender.service.PushMessagesCommandHandleService;
+import jp.co.tdc.line_message_sender.service.RefreshTokenCommandHandleService;
 
 @SpringBootApplication
 @EnableRetry
 public class Application implements ApplicationRunner {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PushMessagesCommandHandleService.class);
 	public static final String REFRESH_TOKEN_COMMAND_NAME = "refresh-token";
 	public static final String PUSH_MESSAGES_TOKEN_COMMAND_NAME = "push-messages";
 
@@ -40,10 +43,11 @@ public class Application implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		Map<String, CommandHandleService> commandHandleServiceMap = new HashMap<>();
+		Map<String, CommandHandleService> commandHandleServiceMap = createCommandHandleServiceMap();
 
-		commandHandleServiceMap.put(REFRESH_TOKEN_COMMAND_NAME, refreshTokenCommandHandler);
-		commandHandleServiceMap.put(PUSH_MESSAGES_TOKEN_COMMAND_NAME, pushMessagesCommandHandler);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("commandNames={}", commandHandleServiceMap.keySet());
+		}
 
 		List<String> nonOptionArgs = args.getNonOptionArgs();
 
@@ -52,6 +56,11 @@ public class Application implements ApplicationRunner {
 		}
 
 		String command = nonOptionArgs.get(0);
+
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("command={}", command);
+		}
+
 		CommandHandleService subCommandService = commandHandleServiceMap.get(command);
 
 		if (subCommandService == null) {
@@ -59,5 +68,14 @@ public class Application implements ApplicationRunner {
 		}
 
 		subCommandService.run(args);
+	}
+
+	private Map<String, CommandHandleService> createCommandHandleServiceMap() {
+		Map<String, CommandHandleService> commandHandleServiceMap = new HashMap<>();
+
+		commandHandleServiceMap.put(REFRESH_TOKEN_COMMAND_NAME, refreshTokenCommandHandler);
+		commandHandleServiceMap.put(PUSH_MESSAGES_TOKEN_COMMAND_NAME, pushMessagesCommandHandler);
+
+		return commandHandleServiceMap;
 	}
 }

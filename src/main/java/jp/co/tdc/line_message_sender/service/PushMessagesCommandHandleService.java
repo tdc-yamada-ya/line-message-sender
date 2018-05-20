@@ -67,8 +67,13 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 		LOGGER.info("Found token - channelTokenId={}", token.getChannelTokenId());
 
 		LineMessagingClient client = new LineMessagingClient(token.getToken());
+
+		// Push APIのコール回数をカウント開始した時刻 (エポックミリ秒)
 		long apiCallCountBaseTimeInMillis;
+
+		// コマンド中のPush APIコール回数
 		int apiCallCountPerMinute;
+
 		int sentCount = 0;
 		int errorCount = 0;
 
@@ -89,6 +94,27 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 						apiCallCountPerMinute = 0;
 
 						while(pushMessageResultSet.next()) {
+							// Push APIのコール回数が設定値を超えた場合、1分間 - APIコールにかかった時間だけスリープする
+							if (apiCallCountPerMinute >= lineProperties.getPushRatePerMinute()) {
+								long span = System.currentTimeMillis() - apiCallCountBaseTimeInMillis;
+								long delay = 60000 - span;
+
+								if (delay > 0) {
+									if (LOGGER.isDebugEnabled()) {
+										LOGGER.debug("API rate over - delay={}", delay);
+									}
+
+									try {
+										Thread.sleep(delay);
+									} catch(InterruptedException e) {
+										LOGGER.warn("Thread sleep interrupted");
+									}
+								}
+
+								apiCallCountBaseTimeInMillis = System.currentTimeMillis();
+								apiCallCountPerMinute = 0;
+							}
+
 							String pushMessageId = pushMessageResultSet.getString(1);
 							String targetType = pushMessageResultSet.getString(2);
 							String target = pushMessageResultSet.getString(3);
@@ -145,22 +171,6 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 								patchPushMessageStatement.executeUpdate();
 
 								errorCount++;
-							}
-
-							if (apiCallCountPerMinute >= lineProperties.getPushRatePerMinute()) {
-								long span = System.currentTimeMillis() - apiCallCountBaseTimeInMillis;
-								long delay = 60000 - span;
-
-								if (delay > 0) {
-									try {
-										Thread.sleep(delay);
-									} catch(InterruptedException e) {
-										LOGGER.warn("Thread sleep interrupted");
-									}
-								}
-
-								apiCallCountBaseTimeInMillis = System.currentTimeMillis();
-								apiCallCountPerMinute = 0;
 							}
 						}
 					}
