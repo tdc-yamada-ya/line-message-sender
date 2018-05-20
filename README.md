@@ -31,6 +31,11 @@ mvn package
 ```
 
 ## 実行手順
+### LINEチャンネル登録
+
+* [LINE Developers](https://developers.line.me/) からLINEチャンネルを登録
+    * プランはフリー以外を選択します
+
 ### データベースの作成
 
 MySQL データベースを作成してください。
