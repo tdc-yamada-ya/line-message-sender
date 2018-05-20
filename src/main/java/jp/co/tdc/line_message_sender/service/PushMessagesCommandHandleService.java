@@ -62,7 +62,7 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 		String tag = tagOptionValues.get(0);
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("tag=\"{}\"", tag);
+			LOGGER.debug("channelId={} tag=\"{}\"", lineProperties.getChannelId(), tag);
 		}
 
 		// 最新のアクセストークンをデータベースから取得
