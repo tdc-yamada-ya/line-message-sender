@@ -2,6 +2,8 @@
 
 LINE に Push Notification API を使用してメッセージを送信するシンプルなJavaコンソールアプリケーションです。
 
+![スクリーンショット](docs/resources/screenshot.png)
+
 ## 機能概要
 
 あらかじめ登録したプッシュメッセージデータリストを元にLINE Messaging API を使用してLINEアプリにメッセージをプッシュします。
