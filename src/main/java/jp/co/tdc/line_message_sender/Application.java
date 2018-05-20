@@ -16,6 +16,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.retry.annotation.EnableRetry;
 
 import jp.co.tdc.line_message_sender.service.CommandHandleService;
+import jp.co.tdc.line_message_sender.service.LoadLineChannelCredentialCommandHandleService;
+import jp.co.tdc.line_message_sender.service.LoadLineMessageTemplateCommandHandleService;
+import jp.co.tdc.line_message_sender.service.LoadLinePushMessageCommandHandleService;
 import jp.co.tdc.line_message_sender.service.PushMessagesCommandHandleService;
 import jp.co.tdc.line_message_sender.service.RefreshTokenCommandHandleService;
 
@@ -24,13 +27,25 @@ import jp.co.tdc.line_message_sender.service.RefreshTokenCommandHandleService;
 public class Application implements ApplicationRunner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PushMessagesCommandHandleService.class);
 	public static final String REFRESH_TOKEN_COMMAND_NAME = "refresh-token";
-	public static final String PUSH_MESSAGES_TOKEN_COMMAND_NAME = "push-messages";
+	public static final String PUSH_MESSAGES_COMMAND_NAME = "push-messages";
+	public static final String LOAD_LINE_CHANNEL_CREDENTIAL_COMMAND_NAME = "load-line-channel-credential";
+	public static final String LOAD_LINE_MESSAGE_TEMPLATE_COMMAND_NAME = "load-line-message-template";
+	public static final String LOAD_LINE_PUSH_MESSAGE_COMMAND_NAME = "load-line-push-message";
 
 	@Autowired
 	private RefreshTokenCommandHandleService refreshTokenCommandHandler;
 
 	@Autowired
 	private PushMessagesCommandHandleService pushMessagesCommandHandler;
+
+	@Autowired
+	private LoadLineChannelCredentialCommandHandleService loadLineChannelCredentialsCommandHandleService;
+
+	@Autowired
+	private LoadLineMessageTemplateCommandHandleService loadLineMessageTemplateCommandHandleService;
+
+	@Autowired
+	private LoadLinePushMessageCommandHandleService loadLinePushMessageCommandHandleService;
 
 	public static void main(String[] args) {
 		SpringApplication application = new SpringApplication(Application.class);
@@ -74,7 +89,10 @@ public class Application implements ApplicationRunner {
 		Map<String, CommandHandleService> commandHandleServiceMap = new HashMap<>();
 
 		commandHandleServiceMap.put(REFRESH_TOKEN_COMMAND_NAME, refreshTokenCommandHandler);
-		commandHandleServiceMap.put(PUSH_MESSAGES_TOKEN_COMMAND_NAME, pushMessagesCommandHandler);
+		commandHandleServiceMap.put(PUSH_MESSAGES_COMMAND_NAME, pushMessagesCommandHandler);
+		commandHandleServiceMap.put(LOAD_LINE_CHANNEL_CREDENTIAL_COMMAND_NAME, loadLineChannelCredentialsCommandHandleService);
+		commandHandleServiceMap.put(LOAD_LINE_MESSAGE_TEMPLATE_COMMAND_NAME, loadLineMessageTemplateCommandHandleService);
+		commandHandleServiceMap.put(LOAD_LINE_PUSH_MESSAGE_COMMAND_NAME, loadLinePushMessageCommandHandleService);
 
 		return commandHandleServiceMap;
 	}

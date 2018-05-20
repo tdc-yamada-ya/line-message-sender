@@ -9,18 +9,18 @@ import javax.persistence.Id;
 @Entity
 public class LineMessageTemplate {
 	@Id
-	private String pushMessageId;
+	private String templateId;
 	@Convert(converter = PayloadTypeConverter.class)
 	private PayloadType payloadType;
 	private String payload;
 	private Date createdAt;
 
-	public String getPushMessageId() {
-		return pushMessageId;
+	public String getTemplateId() {
+		return templateId;
 	}
 
-	public void setPushMessageId(String pushMessageId) {
-		this.pushMessageId = pushMessageId;
+	public void setTemplateId(String templateId) {
+		this.templateId = templateId;
 	}
 
 	public PayloadType getPayloadType() {
