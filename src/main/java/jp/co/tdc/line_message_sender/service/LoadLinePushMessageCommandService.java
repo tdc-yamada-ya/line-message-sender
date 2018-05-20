@@ -13,7 +13,7 @@ import jp.co.tdc.line_message_sender.domain.LinePushMessageRepository;
 import jp.co.tdc.line_message_sender.domain.TargetType;
 
 @Service
-public class LoadLinePushMessageCommandHandleService extends LoadCommandHandleService {
+public class LoadLinePushMessageCommandService extends LoadCommandService {
 	@Autowired
 	private LinePushMessageRepository linePushMessageRepository;
 

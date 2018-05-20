@@ -13,7 +13,7 @@ import jp.co.tdc.line_message_sender.domain.LineMessageTemplateRepository;
 import jp.co.tdc.line_message_sender.domain.PayloadType;
 
 @Service
-public class LoadLineMessageTemplateCommandHandleService extends LoadCommandHandleService {
+public class LoadLineMessageTemplateCommandService extends LoadCommandService {
 	@Autowired
 	private LineMessageTemplateRepository lineMessageTemplateRepository;
 

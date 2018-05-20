@@ -12,7 +12,7 @@ import jp.co.tdc.line_message_sender.domain.LineChannelCredential;
 import jp.co.tdc.line_message_sender.domain.LineChannelCredentialRepository;
 
 @Service
-public class LoadLineChannelCredentialCommandHandleService extends LoadCommandHandleService {
+public class LoadLineChannelCredentialCommandService extends LoadCommandService {
 	@Autowired
 	private LineChannelCredentialRepository lineChannelCredentialRepository;
 

@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 
-public abstract class LoadCommandHandleService implements CommandHandleService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(LoadCommandHandleService.class);
+public abstract class LoadCommandService implements CommandService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(LoadCommandService.class);
 
 	private static final String FILE_OPTION_NAME = "file";
 
@@ -25,7 +25,7 @@ public abstract class LoadCommandHandleService implements CommandHandleService {
 		List<String> fileOptionValues = args.getOptionValues(FILE_OPTION_NAME);
 
 		if (fileOptionValues == null || fileOptionValues.isEmpty()) {
-			throw new CommandHandleServiceException("\"--file=<file>\" is not specified");
+			throw new CommandServiceException("\"--file=<file>\" is not specified");
 		}
 
 		String file = fileOptionValues.get(0);

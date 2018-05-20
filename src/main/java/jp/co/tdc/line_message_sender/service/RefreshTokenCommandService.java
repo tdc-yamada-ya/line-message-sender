@@ -19,8 +19,8 @@ import jp.co.tdc.line_message_sender.line.bot.client.LineOAuthClient;
 import jp.co.tdc.line_message_sender.line.bot.model.AccessToken;
 
 @Service
-public class RefreshTokenCommandHandleService implements CommandHandleService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RefreshTokenCommandHandleService.class);
+public class RefreshTokenCommandService implements CommandService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(RefreshTokenCommandService.class);
 
 	@Autowired
 	private LineProperties lineProperties;
@@ -41,7 +41,7 @@ public class RefreshTokenCommandHandleService implements CommandHandleService {
 		LineChannelCredential credential = lineChannelCredentialRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAtDesc(lineProperties.getChannelId());
 
 		if (credential == null) {
-			throw new CommandHandleServiceException("Credential not found - channelId=" + lineProperties.getChannelId());
+			throw new CommandServiceException("Credential not found - channelId=" + lineProperties.getChannelId());
 		}
 
 		LOGGER.info("Found latest channel credential - channelCredentialId={}", credential.getChannelCredentialId());

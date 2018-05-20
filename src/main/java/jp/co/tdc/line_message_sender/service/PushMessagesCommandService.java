@@ -28,8 +28,8 @@ import jp.co.tdc.line_message_sender.line.bot.model.PushMessage;
 import jp.co.tdc.line_message_sender.line.bot.model.TextMessage;
 
 @Service
-public class PushMessagesCommandHandleService implements CommandHandleService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PushMessagesCommandHandleService.class);
+public class PushMessagesCommandService implements CommandService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PushMessagesCommandService.class);
 
 	private static final String TAG_OPTION_NAME = "tag";
 	private static final String FIND_PUSH_MESSAGES_SQL = "SELECT push_message_id, target_type, target, template_id FROM line_push_message WHERE channel_id = ? AND tag = ? AND sent_at IS NULL AND error_at IS NULL ORDER BY created_at ASC";
@@ -56,7 +56,7 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 		List<String> tagOptionValues = args.getOptionValues(TAG_OPTION_NAME);
 
 		if (tagOptionValues == null || tagOptionValues.isEmpty()) {
-			throw new CommandHandleServiceException("\"--tag=<tag>\" is not specified");
+			throw new CommandServiceException("\"--tag=<tag>\" is not specified");
 		}
 
 		String tag = tagOptionValues.get(0);
@@ -69,7 +69,7 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 		LineChannelToken token = lineChannelTokenRepository.findTopByChannelIdAndRevokedAtIsNullOrderByCreatedAtDesc(lineProperties.getChannelId());
 
 		if (token == null) {
-			throw new CommandHandleServiceException("Token not found - channelId=" + lineProperties.getChannelId());
+			throw new CommandServiceException("Token not found - channelId=" + lineProperties.getChannelId());
 		}
 
 		LOGGER.info("Found latest channel token - channelTokenId={}", token.getChannelTokenId());
@@ -198,7 +198,7 @@ public class PushMessagesCommandHandleService implements CommandHandleService {
 					}
 				}
 			} catch(SQLException e) {
-				throw new CommandHandleServiceException("Database error", e);
+				throw new CommandServiceException("Database error", e);
 			}
 		} finally {
 			LOGGER.info("sentCount={}, errorCount={}", sentCount, errorCount);
