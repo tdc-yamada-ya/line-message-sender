@@ -15,17 +15,17 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.retry.annotation.EnableRetry;
 
-import jp.co.tdc.line_message_sender.service.CommandHandleService;
-import jp.co.tdc.line_message_sender.service.LoadLineChannelCredentialCommandHandleService;
-import jp.co.tdc.line_message_sender.service.LoadLineMessageTemplateCommandHandleService;
-import jp.co.tdc.line_message_sender.service.LoadLinePushMessageCommandHandleService;
-import jp.co.tdc.line_message_sender.service.PushMessagesCommandHandleService;
-import jp.co.tdc.line_message_sender.service.RefreshTokenCommandHandleService;
+import jp.co.tdc.line_message_sender.service.CommandService;
+import jp.co.tdc.line_message_sender.service.LoadLineChannelCredentialCommandService;
+import jp.co.tdc.line_message_sender.service.LoadLineMessageTemplateCommandService;
+import jp.co.tdc.line_message_sender.service.LoadLinePushMessageCommandService;
+import jp.co.tdc.line_message_sender.service.PushMessagesCommandService;
+import jp.co.tdc.line_message_sender.service.RefreshTokenCommandService;
 
 @SpringBootApplication
 @EnableRetry
 public class Application implements ApplicationRunner {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PushMessagesCommandHandleService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PushMessagesCommandService.class);
 	public static final String REFRESH_TOKEN_COMMAND_NAME = "refresh-token";
 	public static final String PUSH_MESSAGES_COMMAND_NAME = "push-messages";
 	public static final String LOAD_CHANNEL_CREDENTIAL_COMMAND_NAME = "load-channel-credential";
@@ -33,19 +33,19 @@ public class Application implements ApplicationRunner {
 	public static final String LOAD_PUSH_MESSAGE_COMMAND_NAME = "load-push-message";
 
 	@Autowired
-	private RefreshTokenCommandHandleService refreshTokenCommandHandler;
+	private RefreshTokenCommandService refreshTokenCommandHandler;
 
 	@Autowired
-	private PushMessagesCommandHandleService pushMessagesCommandHandler;
+	private PushMessagesCommandService pushMessagesCommandHandler;
 
 	@Autowired
-	private LoadLineChannelCredentialCommandHandleService loadLineChannelCredentialsCommandHandleService;
+	private LoadLineChannelCredentialCommandService loadLineChannelCredentialsCommandHandleService;
 
 	@Autowired
-	private LoadLineMessageTemplateCommandHandleService loadLineMessageTemplateCommandHandleService;
+	private LoadLineMessageTemplateCommandService loadLineMessageTemplateCommandHandleService;
 
 	@Autowired
-	private LoadLinePushMessageCommandHandleService loadLinePushMessageCommandHandleService;
+	private LoadLinePushMessageCommandService loadLinePushMessageCommandHandleService;
 
 	public static void main(String[] args) {
 		SpringApplication application = new SpringApplication(Application.class);
@@ -58,7 +58,7 @@ public class Application implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		Map<String, CommandHandleService> commandHandleServiceMap = createCommandHandleServiceMap();
+		Map<String, CommandService> commandHandleServiceMap = createCommandHandleServiceMap();
 
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("commandNames={}", commandHandleServiceMap.keySet());
@@ -76,7 +76,7 @@ public class Application implements ApplicationRunner {
 			LOGGER.debug("command={}", command);
 		}
 
-		CommandHandleService subCommandService = commandHandleServiceMap.get(command);
+		CommandService subCommandService = commandHandleServiceMap.get(command);
 
 		if (subCommandService == null) {
 			throw new ApplicationException("Command \"" + command + "\" not defined");
@@ -85,8 +85,8 @@ public class Application implements ApplicationRunner {
 		subCommandService.run(args);
 	}
 
-	private Map<String, CommandHandleService> createCommandHandleServiceMap() {
-		Map<String, CommandHandleService> commandHandleServiceMap = new HashMap<>();
+	private Map<String, CommandService> createCommandHandleServiceMap() {
+		Map<String, CommandService> commandHandleServiceMap = new HashMap<>();
 
 		commandHandleServiceMap.put(REFRESH_TOKEN_COMMAND_NAME, refreshTokenCommandHandler);
 		commandHandleServiceMap.put(PUSH_MESSAGES_COMMAND_NAME, pushMessagesCommandHandler);
