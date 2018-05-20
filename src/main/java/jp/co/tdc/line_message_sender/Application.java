@@ -28,9 +28,9 @@ public class Application implements ApplicationRunner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PushMessagesCommandHandleService.class);
 	public static final String REFRESH_TOKEN_COMMAND_NAME = "refresh-token";
 	public static final String PUSH_MESSAGES_COMMAND_NAME = "push-messages";
-	public static final String LOAD_LINE_CHANNEL_CREDENTIAL_COMMAND_NAME = "load-line-channel-credential";
-	public static final String LOAD_LINE_MESSAGE_TEMPLATE_COMMAND_NAME = "load-line-message-template";
-	public static final String LOAD_LINE_PUSH_MESSAGE_COMMAND_NAME = "load-line-push-message";
+	public static final String LOAD_CHANNEL_CREDENTIAL_COMMAND_NAME = "load-channel-credential";
+	public static final String LOAD_MESSAGE_TEMPLATE_COMMAND_NAME = "load-message-template";
+	public static final String LOAD_PUSH_MESSAGE_COMMAND_NAME = "load-push-message";
 
 	@Autowired
 	private RefreshTokenCommandHandleService refreshTokenCommandHandler;
@@ -90,9 +90,9 @@ public class Application implements ApplicationRunner {
 
 		commandHandleServiceMap.put(REFRESH_TOKEN_COMMAND_NAME, refreshTokenCommandHandler);
 		commandHandleServiceMap.put(PUSH_MESSAGES_COMMAND_NAME, pushMessagesCommandHandler);
-		commandHandleServiceMap.put(LOAD_LINE_CHANNEL_CREDENTIAL_COMMAND_NAME, loadLineChannelCredentialsCommandHandleService);
-		commandHandleServiceMap.put(LOAD_LINE_MESSAGE_TEMPLATE_COMMAND_NAME, loadLineMessageTemplateCommandHandleService);
-		commandHandleServiceMap.put(LOAD_LINE_PUSH_MESSAGE_COMMAND_NAME, loadLinePushMessageCommandHandleService);
+		commandHandleServiceMap.put(LOAD_CHANNEL_CREDENTIAL_COMMAND_NAME, loadLineChannelCredentialsCommandHandleService);
+		commandHandleServiceMap.put(LOAD_MESSAGE_TEMPLATE_COMMAND_NAME, loadLineMessageTemplateCommandHandleService);
+		commandHandleServiceMap.put(LOAD_PUSH_MESSAGE_COMMAND_NAME, loadLinePushMessageCommandHandleService);
 
 		return commandHandleServiceMap;
 	}

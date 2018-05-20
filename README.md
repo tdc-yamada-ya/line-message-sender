@@ -82,7 +82,7 @@ channel_credential_id,channel_id,channel_secret
 ```
 
 ```bash
-java -jar target/line-message-sender-1.0.0.jar load-line-channel-credential --file=<CSVファイル>
+java -jar target/line-message-sender-1.0.0.jar load-channel-credential --file=<CSVファイル>
 ```
 
 * メッセージテンプレート (line_message_template.csv)
@@ -94,7 +94,7 @@ template_id,payload_type,payload
 ```
 
 ```bash
-java -jar target/line-message-sender-1.0.0.jar load-line-message-template --file=<CSVファイル>
+java -jar target/line-message-sender-1.0.0.jar load-message-template --file=<CSVファイル>
 ```
 
 * プッシュメッセージ (line_push_message.csv)
@@ -112,7 +112,7 @@ push_message_id,channel_id,target_type,target,template_id,tag
 ```
 
 ```bash
-java -jar target/line-message-sender-1.0.0.jar load-line-push-message --file=<CSVファイル>
+java -jar target/line-message-sender-1.0.0.jar load-push-message --file=<CSVファイル>
 ```
 
 ### 短期アクセストークンを取得する
