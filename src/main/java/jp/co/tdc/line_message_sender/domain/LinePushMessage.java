@@ -11,6 +11,7 @@ public class LinePushMessage {
 	@Id
 	private String pushMessageId;
 	private String channelId;
+	private String tag;
 	@Convert(converter = TargetTypeConverter.class)
 	private TargetType targetType;
 	private String target;
@@ -33,6 +34,14 @@ public class LinePushMessage {
 
 	public void setChannelId(String channelId) {
 		this.channelId = channelId;
+	}
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
 	public TargetType getTargetType() {
