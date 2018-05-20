@@ -2,7 +2,7 @@
 
 LINE に Push Notification API を使用してメッセージを送信するシンプルなJavaコンソールアプリケーションです。
 
-![スクリーンショット](docs/resources/screenshot.png)
+![スクリーンショット](docs/resources/screenshot.jpg)
 
 ## 機能概要
 
