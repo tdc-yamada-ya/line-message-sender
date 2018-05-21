@@ -157,6 +157,16 @@ HTTPプロキシ経由でLINE APIにアクセスする必要がある場合は�
 -Dhttps.proxyHost=<プロキシホスト名> -Dhttps.proxyPort=<プロキシポート>
 ```
 
+## パフォーマンス
+
+MacBook Pro (Retina, 13-inch, Late 2013) 4G回線でプッシュ送信したところ **5.5 メッセージ/秒** 程の送信パフォーマンスでした。
+なおこのアプリケーションはシングルスレッドで送信を行なっています。
+
+* MacBook Pro (Retina, 13-inch, Late 2013) 4G回線
+    * 1,000 メッセージ : 180秒 (3分)
+    * 1,0000 メッセージ : 1,800秒 (30分)
+    * 5,0000 メッセージ : 9,090秒 (151分)
+
 ## 構成図
 
 ![構成図](docs/resources/architecture.png)
